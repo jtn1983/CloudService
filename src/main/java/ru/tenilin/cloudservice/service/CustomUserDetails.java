@@ -1,31 +1,25 @@
-package ru.tenilin.cloudservice.config;
+package ru.tenilin.cloudservice.service;
 
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import ru.tenilin.cloudservice.model.User;
+import ru.tenilin.cloudservice.model.UserEntity;
 
 import java.util.Collection;
-import java.util.Collections;
 
 public class CustomUserDetails implements UserDetails {
 
     private String userName;
     private String password;
-    private Collection<? extends GrantedAuthority> grantedAuthorities;
 
-
-    public static CustomUserDetails fromUserEntityToCustomUserDetails(User user) {
-        CustomUserDetails c = new CustomUserDetails();
-        c.userName = user.getUserName();
-        c.password = user.getPassword();
-//        c.grantedAuthorities = Collections.singletonList(new SimpleGrantedAuthority(user.getRoleEntity().getName()));
-        return c;
+    public static CustomUserDetails fromUserEntityToCustomUserDetails(UserEntity user) {
+        CustomUserDetails customUserDetails = new CustomUserDetails();
+        customUserDetails.userName = user.getUserName();
+        customUserDetails.password = user.getPassword();
+        return customUserDetails;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-//        return grantedAuthorities;
         return null;
     }
 

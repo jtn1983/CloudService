@@ -3,59 +3,25 @@ package ru.tenilin.cloudservice.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.session.SessionManagementFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import ru.tenilin.cloudservice.config.jwt.JwtFilter;
-
-import javax.sql.DataSource;
-import java.util.Arrays;
-import java.util.List;
+import ru.tenilin.cloudservice.config.jwt.TokenFilter;
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true, jsr250Enabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-
     @Autowired
-    private CustomUserDetailsService customUserDetailsService;
+    private TokenFilter tokenFilter;
 
-    @Autowired
-    private JwtFilter jwtFilter;
 
-//    @Override
-//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-//        auth.userDetailsService(customUserDetailsService)
-//                .passwordEncoder(new PasswordEncoder() {
-//                    @Override
-//                    public String encode(CharSequence rawPassword) {
-//                        return rawPassword.toString();
-//                    }
-//
-//                    @Override
-//                    public boolean matches(CharSequence rawPassword, String encodedPassword) {
-//                        return true;
-//                    }
-//                });
-//    }
-
-//
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -64,19 +30,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                //.antMatchers("/hi/**").hasRole("USER")
-//                .antMatchers("/hi/**").authenticated()
-//                .antMatchers("/hiadmin/**").hasRole("ADMIN")
-                .antMatchers("/register", "/login").permitAll()
+                .antMatchers("/register", "/login", "/logout").permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(tokenFilter, UsernamePasswordAuthenticationFilter.class);
+
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+
+
 
 
 

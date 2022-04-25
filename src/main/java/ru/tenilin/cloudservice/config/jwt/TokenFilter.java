@@ -6,8 +6,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
-import ru.tenilin.cloudservice.config.CustomUserDetails;
-import ru.tenilin.cloudservice.config.CustomUserDetailsService;
+import ru.tenilin.cloudservice.service.CustomUserDetails;
+import ru.tenilin.cloudservice.service.CustomUserDetailsService;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -20,21 +20,19 @@ import static org.springframework.util.StringUtils.hasText;
 
 @Component
 @Log
-public class JwtFilter extends GenericFilterBean {
+public class TokenFilter extends GenericFilterBean {
 
     public static final String AUTHORIZATION = "auth-token";
 
     @Autowired
-    private JwtProvider jwtProvider;
+    private TokenProvider jwtProvider;
 
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        logger.info("do filter...");
         String token = getTokenFromRequest((HttpServletRequest) servletRequest);
-        logger.info(token);
         if (token != null && jwtProvider.validateToken(token)) {
             String userName = jwtProvider.getLoginFromToken(token);
             CustomUserDetails customUserDetails = customUserDetailsService.loadUserByUsername(userName);
