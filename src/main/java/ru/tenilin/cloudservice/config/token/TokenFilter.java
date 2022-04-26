@@ -1,11 +1,11 @@
-package ru.tenilin.cloudservice.config.jwt;
+package ru.tenilin.cloudservice.config.token;
 
-import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
+import ru.tenilin.cloudservice.Exeptions.InvalidCredentials;
 import ru.tenilin.cloudservice.service.CustomUserDetails;
 import ru.tenilin.cloudservice.service.CustomUserDetailsService;
 
@@ -19,13 +19,12 @@ import java.io.IOException;
 import static org.springframework.util.StringUtils.hasText;
 
 @Component
-@Log
 public class TokenFilter extends GenericFilterBean {
 
     public static final String AUTHORIZATION = "auth-token";
 
     @Autowired
-    private TokenProvider jwtProvider;
+    private TokenProvider tokenProvider;
 
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
@@ -33,8 +32,8 @@ public class TokenFilter extends GenericFilterBean {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         String token = getTokenFromRequest((HttpServletRequest) servletRequest);
-        if (token != null && jwtProvider.validateToken(token)) {
-            String userName = jwtProvider.getLoginFromToken(token);
+        if (token != null && tokenProvider.validateToken(token)) {
+            String userName = tokenProvider.getLoginFromToken(token);
             CustomUserDetails customUserDetails = customUserDetailsService.loadUserByUsername(userName);
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(customUserDetails, null, null);
             SecurityContextHolder.getContext().setAuthentication(auth);

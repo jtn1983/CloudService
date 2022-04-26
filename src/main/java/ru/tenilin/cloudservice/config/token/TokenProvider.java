@@ -1,8 +1,7 @@
-package ru.tenilin.cloudservice.config.jwt;
+package ru.tenilin.cloudservice.config.token;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -12,10 +11,9 @@ import ru.tenilin.cloudservice.repository.UserRepository;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-@Log
 public class TokenProvider {
 
     @Value("$(token.secret)")
@@ -24,7 +22,7 @@ public class TokenProvider {
     @Autowired
     UserRepository userRepository;
 
-    private HashMap<String, String> tokenMap = new HashMap<>();
+    private ConcurrentHashMap<String, String> tokenMap = new ConcurrentHashMap<>();
 
     public String generateToken(String login) {
         Date date = Date.from(LocalDate.now().plusDays(15).atStartOfDay(ZoneId.systemDefault()).toInstant());
@@ -41,7 +39,6 @@ public class TokenProvider {
 
     public void addTokenToMap(String token, UserEntity user) {
         tokenMap.put(token, user.getUserName());
-        System.out.println(tokenMap);
     }
 
     public void removeTokenFromMap(String userName) {

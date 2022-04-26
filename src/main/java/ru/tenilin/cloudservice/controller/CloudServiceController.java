@@ -2,16 +2,14 @@ package ru.tenilin.cloudservice.controller;
 
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
-import ru.tenilin.cloudservice.config.jwt.TokenProvider;
+import ru.tenilin.cloudservice.Exeptions.InvalidCredentials;
+import ru.tenilin.cloudservice.config.token.TokenProvider;
 import ru.tenilin.cloudservice.model.UserEntity;
 import ru.tenilin.cloudservice.service.UserService;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @Log
@@ -49,6 +47,12 @@ public class CloudServiceController {
     public String hiAdmin() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return auth.getName();
+    }
+
+    @ExceptionHandler(InvalidCredentials.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleInvalidCredentials (InvalidCredentials e) {
+        return e.getMessage();
     }
 
 

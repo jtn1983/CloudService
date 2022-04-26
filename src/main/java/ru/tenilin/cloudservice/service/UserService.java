@@ -2,6 +2,7 @@ package ru.tenilin.cloudservice.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.tenilin.cloudservice.Exeptions.InvalidCredentials;
 import ru.tenilin.cloudservice.model.UserEntity;
 import ru.tenilin.cloudservice.repository.UserRepository;
 
@@ -17,12 +18,14 @@ public class UserService{
 
     public UserEntity findByLoginAndPassword(String userName, String password) {
         UserEntity user = findByLogin(userName);
-        if (user != null) {
-            if (password.equals(user.getPassword())) {
-                return user;
-            }
+        if (user == null) {
+            throw new InvalidCredentials("User not found!");
         }
-        return null;
+        if (!password.equals(user.getPassword())) {
+            throw new InvalidCredentials("Password error");
+        }
+        return user;
+
     }
 
 
