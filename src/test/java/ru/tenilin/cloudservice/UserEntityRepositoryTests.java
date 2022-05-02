@@ -30,7 +30,7 @@ public class UserEntityRepositoryTests {
 
         UserEntity savedUser = repository.save(user);
 
-        UserEntity existUser = entityManager.find(UserEntity.class, savedUser.getId());
+        UserEntity existUser = entityManager.find(UserEntity.class, savedUser.getUserId());
 
         assertThat(user.getUserName()).isEqualTo(existUser.getUserName());
     }
