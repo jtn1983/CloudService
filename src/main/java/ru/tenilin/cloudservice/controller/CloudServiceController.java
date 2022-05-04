@@ -1,12 +1,14 @@
 package ru.tenilin.cloudservice.controller;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.apache.tomcat.jni.FileInfo;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import ru.tenilin.cloudservice.Exeptions.InvalidCredentials;
 import ru.tenilin.cloudservice.config.token.TokenProvider;
 import ru.tenilin.cloudservice.model.FileEntity;
@@ -16,6 +18,7 @@ import ru.tenilin.cloudservice.repository.FileRepository;
 import ru.tenilin.cloudservice.service.FileService;
 import ru.tenilin.cloudservice.service.UserService;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -84,9 +87,16 @@ public class CloudServiceController {
 
 
     @PostMapping("/file")
-    public String file(){
-        return "file";
+    public ResponseEntity<FileEntity> upload(@RequestParam MultipartFile file){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userName = authentication.getName();
+        try {
+            return new ResponseEntity<>(fileService.upload(file, userName), HttpStatus.OK);
+        }catch (IOException e){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
+
 
     @ExceptionHandler(InvalidCredentials.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
