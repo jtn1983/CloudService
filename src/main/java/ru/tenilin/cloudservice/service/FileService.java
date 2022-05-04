@@ -1,19 +1,17 @@
 package ru.tenilin.cloudservice.service;
 
-
-import org.apache.tomcat.jni.FileInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.tenilin.cloudservice.model.FileEntity;
 import ru.tenilin.cloudservice.model.FileNameSizeProjection;
 import ru.tenilin.cloudservice.model.UserEntity;
-import ru.tenilin.cloudservice.repository.FileDAO;
 import ru.tenilin.cloudservice.repository.FileRepository;
 import ru.tenilin.cloudservice.repository.UserRepository;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -27,9 +25,6 @@ public class FileService {
     private UserRepository userRepository;
 
     @Autowired
-    private FileDAO fileDAO;
-
-    @Autowired
     private FileManager fileManager;
 
    public List<FileNameSizeProjection> getAllFiles(String userName){
@@ -37,19 +32,18 @@ public class FileService {
        return fileRepository.findFilesByUser(user);
    }
 
-
-    public FileEntity upload(MultipartFile resource, String userName) throws IOException {
+    public void upload(MultipartFile resource, String userName) throws IOException {
        UserEntity user = userRepository.findByUserName(userName);
        String hashFile = generateKey(resource.getName());
        FileEntity createdFile = FileEntity.builder()
                .fileName(resource.getOriginalFilename())
                .fileHash(hashFile)
                .fileSize(resource.getSize())
+               .uploadDate(LocalDate.now())
                .user(user)
                .build();
-       createdFile = fileDAO.create(createdFile);
-       fileManager.upload(resource.getBytes(), hashFile);
-       return createdFile;
+      fileRepository.save(createdFile);
+      fileManager.upload(resource.getBytes(), hashFile);
     }
 
     private String generateKey(String name){

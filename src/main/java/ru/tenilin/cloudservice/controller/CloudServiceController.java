@@ -1,7 +1,5 @@
 package ru.tenilin.cloudservice.controller;
 
-import org.apache.tomcat.jni.FileInfo;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,18 +9,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.tenilin.cloudservice.Exeptions.InvalidCredentials;
 import ru.tenilin.cloudservice.config.token.TokenProvider;
-import ru.tenilin.cloudservice.model.FileEntity;
 import ru.tenilin.cloudservice.model.FileNameSizeProjection;
 import ru.tenilin.cloudservice.model.UserEntity;
-import ru.tenilin.cloudservice.repository.FileRepository;
 import ru.tenilin.cloudservice.service.FileService;
 import ru.tenilin.cloudservice.service.UserService;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 public class CloudServiceController {
@@ -58,12 +51,6 @@ public class CloudServiceController {
         return "Hi user";
     }
 
-    @GetMapping("/hiadmin")
-    public String hiAdmin() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return auth.getName();
-    }
-
     @GetMapping("/list")
     public List<FileNameSizeProjection> getAll(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -71,32 +58,17 @@ public class CloudServiceController {
         return fileService.getAllFiles(name);
     }
 
-//    @GetMapping("/list")
-//    public String getAll(){
-//        JSONObject o1 = new JSONObject();
-//        o1.put("filename", "111.ru");
-//        o1.put("size", 5242880);
-//
-//        JSONArray jsonArray = new JSONArray();
-//        jsonArray.put(o1);
-//
-//        return jsonArray.toString();
-//
-//
-//    }
-
-
     @PostMapping("/file")
-    public ResponseEntity<FileEntity> upload(@RequestParam MultipartFile file){
+    public ResponseEntity<String> upload(@RequestParam MultipartFile file){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
         try {
-            return new ResponseEntity<>(fileService.upload(file, userName), HttpStatus.OK);
+            fileService.upload(file, userName);
+            return new ResponseEntity<>(HttpStatus.OK);
         }catch (IOException e){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
-
 
     @ExceptionHandler(InvalidCredentials.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
