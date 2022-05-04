@@ -1,7 +1,7 @@
 package ru.tenilin.cloudservice.model;
 
 import lombok.*;
-import ru.tenilin.cloudservice.repository.FileRepository;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -30,7 +30,7 @@ public class FileEntity {
     @Column
     private LocalDate uploadDate;
 
-    @ManyToOne(optional = false, cascade = CascadeType.ALL)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "user_id")
     private UserEntity user;
 

@@ -1,5 +1,7 @@
 package ru.tenilin.cloudservice.service;
 
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 
 import java.io.FileOutputStream;
@@ -10,7 +12,7 @@ import java.nio.file.Paths;
 
 @Service
 public class FileManager {
-    private static final String DIRECTORY_PATH = "/Users/tenilin/IdeaProjects/CloudService/src/main/resources/cloud";
+    private static final String DIRECTORY_PATH = "/Users/tenilin/IdeaProjects/CloudService/src/main/resources/cloud/";
 
     public void upload(byte[] resource, String hashName) throws IOException {
         Path path = Paths.get(DIRECTORY_PATH, hashName);
@@ -23,5 +25,20 @@ public class FileManager {
         }finally {
             stream.close();
         }
+    }
+
+    public Resource download(String hashFile) throws IOException{
+        Path path = Paths.get(DIRECTORY_PATH + hashFile);
+        Resource resource = new UrlResource(path.toUri());
+        if (resource.exists() || resource.isReadable()) {
+            return resource;
+        }else {
+            throw new IOException();
+        }
+    }
+
+    public void delete(String fileHash) throws IOException{
+        Path path = Paths.get(DIRECTORY_PATH + fileHash);
+        Files.delete(path);
     }
 }

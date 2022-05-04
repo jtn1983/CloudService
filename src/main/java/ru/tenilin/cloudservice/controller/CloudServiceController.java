@@ -1,6 +1,8 @@
 package ru.tenilin.cloudservice.controller;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.tenilin.cloudservice.Exeptions.InvalidCredentials;
 import ru.tenilin.cloudservice.config.token.TokenProvider;
+import ru.tenilin.cloudservice.model.FileEntity;
 import ru.tenilin.cloudservice.model.FileNameSizeProjection;
 import ru.tenilin.cloudservice.model.UserEntity;
 import ru.tenilin.cloudservice.service.FileService;
@@ -67,6 +70,40 @@ public class CloudServiceController {
             return new ResponseEntity<>(HttpStatus.OK);
         }catch (IOException e){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/file")
+    public ResponseEntity<Resource> download(@RequestParam String filename){
+        try{
+            FileEntity foundFile = fileService.getFileByName(filename);
+            Resource resource = fileService.download(foundFile.getFileHash());
+            return ResponseEntity.ok()
+                    .header("Content-Disposition", "attachment; filename=" + foundFile.getFileName())
+                    .body(resource);
+        }catch (IOException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @DeleteMapping("/file")
+    public ResponseEntity<Void> delete(@RequestParam String filename){
+        try{
+            fileService.delete(filename);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }catch (IOException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping("/file")
+    public ResponseEntity update(@RequestParam String filename, @RequestBody String request){
+        JSONObject jsonObject = new JSONObject(request);
+        try {
+            fileService.update(filename, jsonObject.getString("filename"));
+            return new ResponseEntity<>(HttpStatus.OK);
+        }catch (IOException e){
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
     }
 

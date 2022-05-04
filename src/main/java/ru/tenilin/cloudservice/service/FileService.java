@@ -1,6 +1,7 @@
 package ru.tenilin.cloudservice.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.tenilin.cloudservice.model.FileEntity;
@@ -32,7 +33,12 @@ public class FileService {
        return fileRepository.findFilesByUser(user);
    }
 
+   public FileEntity getFileByName(String fileName){
+       return fileRepository.findByFileName(fileName);
+   }
+
     public void upload(MultipartFile resource, String userName) throws IOException {
+       checkFileName(resource.getOriginalFilename());
        UserEntity user = userRepository.findByUserName(userName);
        String hashFile = generateKey(resource.getName());
        FileEntity createdFile = FileEntity.builder()
@@ -46,7 +52,33 @@ public class FileService {
       fileManager.upload(resource.getBytes(), hashFile);
     }
 
+    public Resource download(String hashFile) throws IOException{
+       return fileManager.download(hashFile);
+    }
+
+    public void delete(String fileName) throws IOException{
+       FileEntity file = fileRepository.findByFileName(fileName);
+       fileRepository.delete(file);
+       fileManager.delete(file.getFileHash());
+    }
+
+    public void update(String oldFileName, String newFileName) throws IOException{
+       checkFileName(newFileName);
+       FileEntity file = fileRepository.findByFileName(oldFileName);
+       if (file != null) {
+           fileRepository.updateFileName(newFileName, oldFileName);
+       }else {
+           throw new IOException();
+       }
+    }
+
     private String generateKey(String name){
        return DigestUtils.md5Hex(name + LocalDateTime.now().toString());
+    }
+
+    private void checkFileName(String fileName) throws IOException{
+       if (fileRepository.findByFileName(fileName) != null) {
+           throw new IOException();
+       }
     }
 }
