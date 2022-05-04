@@ -1,8 +1,7 @@
-package ru.tenilin.cloudservice.config.token;
+package ru.tenilin.cloudservice.service;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.tenilin.cloudservice.model.UserEntity;
@@ -14,15 +13,19 @@ import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class TokenProvider {
+public class TokenService {
 
     @Value("$(token.secret)")
     private String tokenSecret;
 
-    @Autowired
+    final
     UserRepository userRepository;
 
     private ConcurrentHashMap<String, String> tokenMap = new ConcurrentHashMap<>();
+
+    public TokenService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     public String generateToken(String login) {
         Date date = Date.from(LocalDate.now().plusDays(15).atStartOfDay(ZoneId.systemDefault()).toInstant());

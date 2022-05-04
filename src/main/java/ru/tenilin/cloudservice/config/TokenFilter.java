@@ -1,13 +1,12 @@
-package ru.tenilin.cloudservice.config.token;
+package ru.tenilin.cloudservice.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
-import ru.tenilin.cloudservice.Exeptions.InvalidCredentials;
 import ru.tenilin.cloudservice.service.CustomUserDetails;
 import ru.tenilin.cloudservice.service.CustomUserDetailsService;
+import ru.tenilin.cloudservice.service.TokenService;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -23,17 +22,20 @@ public class TokenFilter extends GenericFilterBean {
 
     public static final String AUTHORIZATION = "auth-token";
 
-    @Autowired
-    private TokenProvider tokenProvider;
+    private final TokenService tokenService;
 
-    @Autowired
-    private CustomUserDetailsService customUserDetailsService;
+    private final CustomUserDetailsService customUserDetailsService;
+
+    public TokenFilter(TokenService tokenService, CustomUserDetailsService customUserDetailsService) {
+        this.tokenService = tokenService;
+        this.customUserDetailsService = customUserDetailsService;
+    }
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         String token = getTokenFromRequest((HttpServletRequest) servletRequest);
-        if (token != null && tokenProvider.validateToken(token)) {
-            String userName = tokenProvider.getLoginFromToken(token);
+        if (token != null && tokenService.validateToken(token)) {
+            String userName = tokenService.getLoginFromToken(token);
             CustomUserDetails customUserDetails = customUserDetailsService.loadUserByUsername(userName);
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(customUserDetails, null, null);
             SecurityContextHolder.getContext().setAuthentication(auth);

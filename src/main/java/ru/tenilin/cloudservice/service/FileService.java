@@ -1,6 +1,6 @@
 package ru.tenilin.cloudservice.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.support.PagedListHolder;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,18 +19,25 @@ import java.util.List;
 @Service
 public class FileService {
 
-    @Autowired
-    private FileRepository fileRepository;
+    private final FileRepository fileRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private FileManager fileManager;
+    private final FileManager fileManager;
 
-   public List<FileNameSizeProjection> getAllFiles(String userName){
+    public FileService(FileRepository fileRepository, UserRepository userRepository, FileManager fileManager) {
+        this.fileRepository = fileRepository;
+        this.userRepository = userRepository;
+        this.fileManager = fileManager;
+    }
+
+    public List<FileNameSizeProjection> getAllFiles(String userName, Integer limit){
        UserEntity user = userRepository.findByUserName(userName);
-       return fileRepository.findFilesByUser(user);
+       List<FileNameSizeProjection> files = fileRepository.findFilesByUser(user);
+       PagedListHolder<FileNameSizeProjection> pages = new PagedListHolder<>(files);
+       pages.setPage(0);
+       pages.setPageSize(limit);
+       return pages.getPageList();
    }
 
    public FileEntity getFileByName(String fileName){
