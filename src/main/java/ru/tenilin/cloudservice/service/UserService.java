@@ -5,7 +5,7 @@ import ru.tenilin.cloudservice.model.UserEntity;
 import ru.tenilin.cloudservice.repository.UserRepository;
 
 @Service
-public class UserService{
+public class UserService {
 
     private final UserRepository userRepository;
 
@@ -13,14 +13,11 @@ public class UserService{
         this.userRepository = userRepository;
     }
 
-    public UserEntity findUserByLoginPassword(String userName, String password) {
+    public UserEntity findUserByLoginPassword(String userName, String password) throws NullPointerException {
         if (userRepository.findByUserNameAndPassword(userName, password) != null) {
             return userRepository.findByUserNameAndPassword(userName, password);
-        }else {
+        } else {
             throw new NullPointerException();
         }
     }
-
-
-
 }

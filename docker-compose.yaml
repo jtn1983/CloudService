@@ -1,0 +1,21 @@
+version: '3'
+services:
+  cloud-db:
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=cloudservicedb
+      - MYSQL_USER=myapp-user
+      - MYSQL_PASSWORD=jakov123
+    ports:
+      - 3306:3306
+
+  cloud-app:
+    build: ./
+    restart: on-failure
+    expose:
+      - "8080"
+    depends_on:
+      - cloud-db
+    ports:
+      - 8080:8080

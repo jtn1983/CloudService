@@ -1,6 +1,7 @@
 package ru.tenilin.cloudservice.model;
 
 import lombok.*;
+
 import javax.persistence.*;
 import java.time.LocalDate;
 
@@ -31,5 +32,4 @@ public class FileEntity {
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id")
     private UserEntity user;
-
 }

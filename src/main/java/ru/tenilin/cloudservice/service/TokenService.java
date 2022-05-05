@@ -18,10 +18,9 @@ public class TokenService {
     @Value("$(token.secret)")
     private String tokenSecret;
 
-    final
-    UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    private ConcurrentHashMap<String, String> tokenMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, String> tokenMap = new ConcurrentHashMap<>();
 
     public TokenService(UserRepository userRepository) {
         this.userRepository = userRepository;

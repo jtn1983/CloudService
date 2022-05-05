@@ -21,9 +21,7 @@ import static org.springframework.util.StringUtils.hasText;
 public class TokenFilter extends GenericFilterBean {
 
     public static final String AUTHORIZATION = "auth-token";
-
     private final TokenService tokenService;
-
     private final CustomUserDetailsService customUserDetailsService;
 
     public TokenFilter(TokenService tokenService, CustomUserDetailsService customUserDetailsService) {

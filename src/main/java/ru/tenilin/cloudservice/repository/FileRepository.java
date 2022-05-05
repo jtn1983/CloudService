@@ -13,7 +13,8 @@ import java.util.List;
 
 public interface FileRepository extends JpaRepository<FileEntity, Long> {
 
-    @Query(value = "select f.file_name as filename, f.file_size as size from files f where f.user_id = :user", nativeQuery = true)
+    @Query(value = "select f.file_name as filename, f.file_size as size from files f where f.user_id = :user",
+            nativeQuery = true)
     List<FileNameSizeProjection> findFilesByUser(UserEntity user);
 
     FileEntity findByFileName(String fileName);

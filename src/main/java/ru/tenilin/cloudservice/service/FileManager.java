@@ -12,7 +12,7 @@ import java.nio.file.Paths;
 
 @Service
 public class FileManager {
-    private static final String DIRECTORY_PATH = "/Users/tenilin/IdeaProjects/CloudService/src/main/resources/cloud/";
+    private String DIRECTORY_PATH = "src/main/resources/cloud/";
 
     public void upload(byte[] resource, String hashName) throws IOException {
         Path path = Paths.get(DIRECTORY_PATH, hashName);
@@ -22,22 +22,22 @@ public class FileManager {
         try {
             stream = new FileOutputStream(file.toString());
             stream.write(resource);
-        }finally {
+        } finally {
             stream.close();
         }
     }
 
-    public Resource download(String hashFile) throws IOException{
+    public Resource download(String hashFile) throws IOException {
         Path path = Paths.get(DIRECTORY_PATH + hashFile);
         Resource resource = new UrlResource(path.toUri());
         if (resource.exists() || resource.isReadable()) {
             return resource;
-        }else {
+        } else {
             throw new IOException();
         }
     }
 
-    public void delete(String fileHash) throws IOException{
+    public void delete(String fileHash) throws IOException {
         Path path = Paths.get(DIRECTORY_PATH + fileHash);
         Files.delete(path);
     }

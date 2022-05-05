@@ -1,6 +1,7 @@
 package ru.tenilin.cloudservice.model;
 
 import lombok.*;
+
 import javax.persistence.*;
 
 @Entity
@@ -20,5 +21,4 @@ public class UserEntity {
 
     @Column
     private String password;
-
 }
